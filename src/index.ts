@@ -11,6 +11,8 @@ import { handlerValidateChirp } from "./api/validateChirp.js";
 const app = express();
 const PORT = 8080;
 
+// built in JSON body parsing middleware
+app.use(express.json());
 // middleware
 app.use(middlewareLogResponses);
 // serve static files from the /app/

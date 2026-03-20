@@ -1,6 +1,29 @@
 import { Request, Response } from "express";
 
 export function handlerValidateChirp(req: Request, res: Response) {
+	// TODO move into .env
+	const maxSize = 140;
+
+	type parameters = {
+		body: string;
+	};
+
+	try {
+		const params: parameters = req.body;
+		if (params.body.length > maxSize) throw new Error("Chirp is too long");
+		res.header("Content-Type", "application/json");
+		res.status(200).send({ valid: true });
+	} catch (err: unknown) {
+		if (err instanceof Error) {
+			res.status(400).send({ error: err.message });
+			return;
+		}
+		res.status(400).send({ error: "Something went wrong" });
+		return;
+	}
+}
+
+export function handlerManuallyValidateChirp(req: Request, res: Response) {
 	let body = "";
 	const maxSize = 140;
 	console.log(`hello from validateChirp start`);
