@@ -1,24 +1,35 @@
 import { Request, Response } from "express";
+import { respondWithError, respondWithJSON } from "./json.js";
+
+type parameters = {
+	body: string;
+};
 
 export function handlerValidateChirp(req: Request, res: Response) {
 	// TODO move into .env
 	const maxSize = 140;
-
-	type parameters = {
-		body: string;
-	};
-
 	try {
 		const params: parameters = req.body;
 		if (params.body.length > maxSize) throw new Error("Chirp is too long");
-		res.header("Content-Type", "application/json");
-		res.status(200).send({ valid: true });
+
+		const words = params.body.split(" ");
+		const profaneWords = ["kerfuffle", "sharbert", "fornax"];
+
+		for (let i = 0; i < words.length; i++) {
+			if (profaneWords.includes(words[i].toLowerCase())) {
+				words[i] = "****";
+			}
+		}
+
+		const body = words.join(" ");
+		respondWithJSON(res, 200, body);
 	} catch (err: unknown) {
 		if (err instanceof Error) {
-			res.status(400).send({ error: err.message });
+			respondWithError(res, 400, err.message);
+
 			return;
 		}
-		res.status(400).send({ error: "Something went wrong" });
+		respondWithError(res, 400, "Something went wrong");
 		return;
 	}
 }
