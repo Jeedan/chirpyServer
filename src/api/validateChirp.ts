@@ -5,33 +5,27 @@ type parameters = {
 	body: string;
 };
 
-export function handlerValidateChirp(req: Request, res: Response) {
+export async function handlerValidateChirp(
+	req: Request,
+	res: Response,
+): Promise<void> {
 	// TODO move into .env
 	const maxSize = 140;
-	try {
-		const params: parameters = req.body;
-		if (params.body.length > maxSize) throw new Error("Chirp is too long");
 
-		const words = params.body.split(" ");
-		const profaneWords = ["kerfuffle", "sharbert", "fornax"];
+	const params: parameters = req.body;
+	if (params.body.length > maxSize) throw new Error("Chirp is too long");
 
-		for (let i = 0; i < words.length; i++) {
-			if (profaneWords.includes(words[i].toLowerCase())) {
-				words[i] = "****";
-			}
+	const words = params.body.split(" ");
+	const profaneWords = ["kerfuffle", "sharbert", "fornax"];
+
+	for (let i = 0; i < words.length; i++) {
+		if (profaneWords.includes(words[i].toLowerCase())) {
+			words[i] = "****";
 		}
-
-		const body = words.join(" ");
-		respondWithJSON(res, 200, body);
-	} catch (err: unknown) {
-		if (err instanceof Error) {
-			respondWithError(res, 400, err.message);
-
-			return;
-		}
-		respondWithError(res, 400, "Something went wrong");
-		return;
 	}
+
+	const body = words.join(" ");
+	respondWithJSON(res, 200, body);
 }
 
 export function handlerManuallyValidateChirp(req: Request, res: Response) {

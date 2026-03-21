@@ -7,6 +7,7 @@ import {
 	middlewareMetricsInc,
 } from "./api/middleware.js";
 import { handlerValidateChirp } from "./api/validateChirp.js";
+import { asyncHandler, errorHandler } from "./api/errorhandler.js";
 
 const app = express();
 const PORT = 8080;
@@ -23,10 +24,13 @@ app.get("/admin/metrics", handlerMetrics);
 app.post("/admin/reset", handlerReset);
 
 // api
-app.post("/api/validate_chirp", handlerValidateChirp);
+app.post("/api/validate_chirp", asyncHandler(handlerValidateChirp));
 
 // health check
 app.get("/api/healthz", handlerReadiness);
+
+//error handling middleware last to catch all errors
+app.use(errorHandler);
 
 app.listen(PORT, () => {
 	console.log(`Server is running at http://localhost:${PORT}`);
