@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { respondWithError, respondWithJSON } from "./json.js";
+import { respondWithJSON } from "./json.js";
+import { BadRequestError } from "./errors.js";
 
 type parameters = {
 	body: string;
@@ -13,7 +14,8 @@ export async function handlerValidateChirp(
 	const maxSize = 140;
 
 	const params: parameters = req.body;
-	if (params.body.length > maxSize) throw new Error("Chirp is too long");
+	if (params.body.length > maxSize)
+		throw new BadRequestError("Chirp is too long. Max length is 140");
 
 	const words = params.body.split(" ");
 	const profaneWords = ["kerfuffle", "sharbert", "fornax"];

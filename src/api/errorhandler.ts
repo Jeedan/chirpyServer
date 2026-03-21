@@ -1,5 +1,6 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import e, { NextFunction, Request, RequestHandler, Response } from "express";
 import { respondWithError } from "./json.js";
+import { AppError } from "./errors.js";
 
 export function errorHandler(
 	err: Error,
@@ -7,8 +8,12 @@ export function errorHandler(
 	res: Response,
 	next: NextFunction,
 ) {
-	console.error("Something went wrong on our end");
-	respondWithError(res, 500, "Something went wrong on our end");
+	if (err instanceof AppError) {
+		respondWithError(res, err.statusCode, err.message);
+	} else {
+		console.error("Something went wrong on our end: ", err);
+		respondWithError(res, 500, "Internal Server Error");
+	}
 }
 
 // wraps async functions and returns a promise
