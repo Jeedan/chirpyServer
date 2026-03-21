@@ -1,4 +1,4 @@
-import e, { NextFunction, Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { respondWithError } from "./json.js";
 import { AppError } from "./errors.js";
 
