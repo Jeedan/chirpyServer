@@ -8,6 +8,7 @@ import {
 } from "./api/middleware.js";
 import { handlerValidateChirp } from "./api/validateChirp.js";
 import { asyncHandler, errorHandler } from "./api/errorhandler.js";
+import { handlerCreateUser } from "./api/users.js";
 
 const app = express();
 const PORT = 8080;
@@ -21,10 +22,13 @@ app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 
 // admin
 app.get("/admin/metrics", handlerMetrics);
-app.post("/admin/reset", handlerReset);
+app.post("/admin/reset", asyncHandler(handlerReset));
 
 // api
 app.post("/api/validate_chirp", asyncHandler(handlerValidateChirp));
+
+// users
+app.post("/api/users", asyncHandler(handlerCreateUser));
 
 // health check
 app.get("/api/healthz", handlerReadiness);
