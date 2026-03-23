@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import { respondWithJSON } from "./json.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
-import { createChirp, getAllChirps } from "../db/queries/chirps.js";
+import {
+	createChirp,
+	getAllChirps,
+	getChirpById,
+} from "../db/queries/chirps.js";
 
 type parameters = {
 	body: string;
@@ -54,4 +58,14 @@ export async function handlerGetAllChirps(req: Request, res: Response) {
 	if (chirps.length === 0)
 		throw new NotFoundError("No Chirps found in Database");
 	respondWithJSON(res, 200, chirps);
+}
+
+export async function handlerGetChirp(req: Request, res: Response) {
+	const { chirpId } = req.params;
+	if (typeof chirpId !== "string")
+		throw new BadRequestError("Invalid chirp ID");
+
+	const chirp = await getChirpById(chirpId);
+	if (!chirp) throw new NotFoundError(`No Chirp found with id: ${chirpId}`);
+	respondWithJSON(res, 200, chirp);
 }
