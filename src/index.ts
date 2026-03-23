@@ -6,8 +6,8 @@ import {
 	middlewareLogResponses,
 	middlewareMetricsInc,
 } from "./api/middleware.js";
-import { handlerValidateChirp } from "./api/validateChirp.js";
 import { asyncHandler, errorHandler } from "./api/errorhandler.js";
+import { handlerCreateChirp } from "./api/chirps.js";
 import { handlerCreateUser } from "./api/users.js";
 
 const app = express();
@@ -25,7 +25,7 @@ app.get("/admin/metrics", handlerMetrics);
 app.post("/admin/reset", asyncHandler(handlerReset));
 
 // api
-app.post("/api/validate_chirp", asyncHandler(handlerValidateChirp));
+app.post("/api/chirps", asyncHandler(handlerCreateChirp));
 
 // users
 app.post("/api/users", asyncHandler(handlerCreateUser));

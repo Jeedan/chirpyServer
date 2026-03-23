@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { BadRequestError, NotFoundError } from "./errors.js";
+import { BadRequestError } from "./errors.js";
 import { respondWithJSON } from "./json.js";
 import { createUser } from "../db/queries/users.js";
 
