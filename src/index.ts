@@ -7,7 +7,7 @@ import {
 	middlewareMetricsInc,
 } from "./api/middleware.js";
 import { asyncHandler, errorHandler } from "./api/errorhandler.js";
-import { handlerCreateChirp } from "./api/chirps.js";
+import { handlerCreateChirp, handlerGetAllChirps } from "./api/chirps.js";
 import { handlerCreateUser } from "./api/users.js";
 
 const app = express();
@@ -26,6 +26,7 @@ app.post("/admin/reset", asyncHandler(handlerReset));
 
 // api
 app.post("/api/chirps", asyncHandler(handlerCreateChirp));
+app.get("/api/chirps", asyncHandler(handlerGetAllChirps));
 
 // users
 app.post("/api/users", asyncHandler(handlerCreateUser));
