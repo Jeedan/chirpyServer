@@ -7,8 +7,13 @@ import {
 	middlewareMetricsInc,
 } from "./api/middleware.js";
 import { asyncHandler, errorHandler } from "./api/errorhandler.js";
-import { handlerCreateChirp, handlerGetAllChirps, handlerGetChirp } from "./api/chirps.js";
+import {
+	handlerCreateChirp,
+	handlerGetAllChirps,
+	handlerGetChirp,
+} from "./api/chirps.js";
 import { handlerCreateUser } from "./api/users.js";
+import { handlerLogin } from "./api/auth.js";
 
 const app = express();
 const PORT = 8080;
@@ -20,17 +25,21 @@ app.use(middlewareLogResponses);
 // serve static files from the /app/
 app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 
-// admin
+// admin routes
 app.get("/admin/metrics", handlerMetrics);
 app.post("/admin/reset", asyncHandler(handlerReset));
 
-// api
+// api routes
+// chirps
 app.post("/api/chirps", asyncHandler(handlerCreateChirp));
 app.get("/api/chirps", asyncHandler(handlerGetAllChirps));
 app.get("/api/chirps/:chirpId", asyncHandler(handlerGetChirp));
 
 // users
 app.post("/api/users", asyncHandler(handlerCreateUser));
+
+// login
+app.post("/api/login", asyncHandler(handlerLogin));
 
 // health check
 app.get("/api/healthz", handlerReadiness);
