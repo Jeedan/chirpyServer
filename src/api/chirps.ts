@@ -6,19 +6,20 @@ import {
 	getAllChirps,
 	getChirpById,
 } from "../db/queries/chirps.js";
+import { validateJWT, getBearerToken } from "../auth.js";
+import { config } from "../config.js";
 
 type parameters = {
 	body: string;
-	userId: string;
 };
 
 export async function handlerCreateChirp(req: Request, res: Response) {
 	const params: parameters = req.body;
-	const { body, userId } = params;
+	const { body } = params;
+
+	const userId = getUserIdFromToken(req);
 
 	if (!body || body.length === 0) throw new BadRequestError("Empty Chirp");
-	if (!userId || userId.length === 0)
-		throw new BadRequestError(`Invalid user_id`);
 
 	const cleanedBody = validateChirp(params);
 	const chirp = await createChirp({ body: cleanedBody, userId });
@@ -32,6 +33,15 @@ export async function handlerCreateChirp(req: Request, res: Response) {
 	};
 
 	respondWithJSON(res, 201, payload);
+}
+
+function getUserIdFromToken(req: Request): string {
+	const token = getBearerToken(req);
+	const userId = validateJWT(token, config.jwtSecret);
+	if (!userId || userId.length === 0)
+		throw new BadRequestError(`Invalid JWT`);
+
+	return userId;
 }
 
 function validateChirp(params: parameters): string {

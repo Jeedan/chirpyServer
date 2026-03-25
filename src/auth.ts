@@ -1,6 +1,8 @@
 import argon2 from "argon2";
+import { Request } from "express";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
+import { BadRequestError } from "./api/errors.js";
 
 export async function hashPassword(password: string): Promise<string> {
 	const hash = await argon2.hash(password);
@@ -54,4 +56,20 @@ export function validateJWT(tokenString: string, secret: string): string {
 			throw new Error(`Could not validate JWT: ${err}`);
 		}
 	}
+}
+
+export function getBearerToken(req: Request): string {
+	const bearerHeader = req.get("Authorization");
+	return extractBearerToken(bearerHeader);
+}
+
+export function extractBearerToken(header: string | undefined): string {
+	if (!header || !header.startsWith("Bearer "))
+		throw new BadRequestError("No Authorization token found");
+	const splitHeader = header.split(" ");
+	if (splitHeader.length < 2)
+		throw new BadRequestError("Invalid Bearer Token");
+	const token = splitHeader[1];
+	if (!token) throw new BadRequestError("Empty Token");
+	return token;
 }

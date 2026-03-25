@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { checkPasswordHash, hashPassword, makeJWT, validateJWT } from "./auth";
+import {
+	checkPasswordHash,
+	hashPassword,
+	makeJWT,
+	validateJWT,
+	extractBearerToken,
+} from "./auth.js";
 
 describe("Password Hashing", () => {
 	const password1 = "correctPassword123!";
@@ -36,6 +42,31 @@ describe("JWT", () => {
 		expect(() => {
 			const expiredToken = makeJWT(userID, 0, secret);
 			validateJWT(expiredToken, secret);
+		}).toThrow();
+	});
+});
+
+describe("Get Bearer Token", () => {
+	const token = extractBearerToken("Bearer token123");
+	it("should return true if the token matches the Authorization header", async () => {
+		expect(token).toBe("token123");
+	});
+
+	it("should throw when an empty string is passed as Header", async () => {
+		expect(() => {
+			const token = extractBearerToken("");
+		}).toThrow();
+	});
+
+	it("should throw when missing the token in the Authorization header", async () => {
+		expect(() => {
+			const token = extractBearerToken("Bearer ");
+		}).toThrow();
+	});
+
+	it("should throw when missing the Bearer part of the Authorization header", async () => {
+		expect(() => {
+			const token = extractBearerToken(" 123Token");
 		}).toThrow();
 	});
 });
