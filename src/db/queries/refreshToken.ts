@@ -7,7 +7,7 @@ export async function saveRefreshToken(token: NewRefreshToken) {
 	return result;
 }
 
-export async function getUserForRefreshToken(token: string) {
+export async function getUserFromRefreshToken(token: string) {
 	const [result] = await db
 		.select({
 			token: refreshTokens.token,

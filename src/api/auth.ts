@@ -13,7 +13,7 @@ import { config } from "../config.js";
 import {
 	revokeRefreshToken,
 	saveRefreshToken,
-	getUserForRefreshToken,
+	getUserFromRefreshToken,
 } from "../db/queries/refreshToken.js";
 
 type parameters = {
@@ -63,9 +63,8 @@ export async function handlerLogin(req: Request, res: Response) {
 }
 
 export async function handlerRefreshToken(req: Request, res: Response) {
-	const bearerToken = await getRefreshTokenFromHeader(req);
-
-	const refreshToken = await getUserForRefreshToken(bearerToken);
+	const bearerToken = getBearerToken(req);
+	const refreshToken = await getUserFromRefreshToken(bearerToken);
 	if (
 		!refreshToken ||
 		refreshToken.revokedAt ||
@@ -82,15 +81,7 @@ export async function handlerRefreshToken(req: Request, res: Response) {
 }
 
 export async function handlerRevokeToken(req: Request, res: Response) {
-	const refreshToken = await getRefreshTokenFromHeader(req);
+	const refreshToken = getBearerToken(req);
 	await revokeRefreshToken(refreshToken);
 	res.status(204).send();
-}
-
-async function getRefreshTokenFromHeader(req: Request) {
-	const bearerToken = getBearerToken(req);
-	if (!bearerToken)
-		throw new UnauthorizedError("No Authorization token found");
-
-	return bearerToken;
 }
