@@ -13,7 +13,11 @@ import {
 	handlerGetChirp,
 } from "./api/chirps.js";
 import { handlerCreateUser } from "./api/users.js";
-import { handlerLogin } from "./api/auth.js";
+import {
+	handlerLogin,
+	handlerRefreshToken,
+	handlerRevokeToken,
+} from "./api/auth.js";
 
 const app = express();
 const PORT = 8080;
@@ -40,6 +44,8 @@ app.post("/api/users", asyncHandler(handlerCreateUser));
 
 // login
 app.post("/api/login", asyncHandler(handlerLogin));
+app.post("/api/refresh", asyncHandler(handlerRefreshToken));
+app.post("/api/revoke", asyncHandler(handlerRevokeToken));
 
 // health check
 app.get("/api/healthz", handlerReadiness);

@@ -2,7 +2,8 @@ import argon2 from "argon2";
 import { Request } from "express";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
-import { BadRequestError } from "./api/errors.js";
+import { BadRequestError, UnauthorizedError } from "./api/errors.js";
+import { randomBytes } from "node:crypto";
 
 export async function hashPassword(password: string): Promise<string> {
 	const hash = await argon2.hash(password);
@@ -50,7 +51,7 @@ export function validateJWT(tokenString: string, secret: string): string {
 	} catch (err: unknown) {
 		if (err instanceof Error) {
 			console.error(err.message);
-			throw new Error(err.message);
+			throw new UnauthorizedError(err.message);
 		} else {
 			console.error(err);
 			throw new Error(`Could not validate JWT: ${err}`);
@@ -72,4 +73,8 @@ export function extractBearerToken(header: string | undefined): string {
 	const token = splitHeader[1];
 	if (!token) throw new BadRequestError("Empty Token");
 	return token;
+}
+
+export function makeRefreshToken(): string {
+	return randomBytes(32).toString("hex");
 }
