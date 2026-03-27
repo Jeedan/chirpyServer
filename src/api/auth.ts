@@ -46,7 +46,7 @@ export async function handlerLogin(req: Request, res: Response) {
 		throw new UnauthorizedError(
 			`Unauthorized Access: incorrect Email or Password`,
 		);
-	const accessToken = makeJWT(user.id, oneHourInSeconds, config.jwtSecret);
+	const accessToken = makeJWT(user.id, oneHourInSeconds, config.jwt.secret);
 	const refreshToken: NewRefreshToken = {
 		token: makeRefreshToken(),
 		userId: user.id,
@@ -70,7 +70,7 @@ export async function handlerLogin(req: Request, res: Response) {
 
 export async function handlerRefreshToken(req: Request, res: Response) {
 	const userId = await getUserIdFromRefreshToken(req);
-	const accessToken = makeJWT(userId, oneHourInSeconds, config.jwtSecret);
+	const accessToken = makeJWT(userId, oneHourInSeconds, config.jwt.secret);
 	respondWithJSON(res, 200, { token: accessToken });
 }
 

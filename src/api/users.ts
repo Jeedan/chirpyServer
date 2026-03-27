@@ -40,7 +40,7 @@ export async function handlerCreateUser(req: Request, res: Response) {
 export async function handlerUpdateUser(req: Request, res: Response) {
 	const { email, password }: parameters = req.body;
 	const accessToken = getBearerToken(req);
-	const userId = validateJWT(accessToken, config.jwtSecret);
+	const userId = validateJWT(accessToken, config.jwt.secret);
 
 	if (!email || email.length === 0)
 		throw new BadRequestError("No email provided to update");

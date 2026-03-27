@@ -9,6 +9,7 @@ import {
 import { asyncHandler, errorHandler } from "./api/errorhandler.js";
 import {
 	handlerCreateChirp,
+	handlerDeleteChirp,
 	handlerGetAllChirps,
 	handlerGetChirp,
 } from "./api/chirps.js";
@@ -38,6 +39,7 @@ app.post("/admin/reset", asyncHandler(handlerReset));
 app.post("/api/chirps", asyncHandler(handlerCreateChirp));
 app.get("/api/chirps", asyncHandler(handlerGetAllChirps));
 app.get("/api/chirps/:chirpId", asyncHandler(handlerGetChirp));
+app.delete("/api/chirps/:chirpId", asyncHandler(handlerDeleteChirp));
 
 // users
 app.post("/api/users", asyncHandler(handlerCreateUser));
