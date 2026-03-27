@@ -6,6 +6,7 @@ import { NewUser, NewRefreshToken } from "../db/schema.js";
 import {
 	checkPasswordHash,
 	getBearerToken,
+	getUserIdFromRefreshToken,
 	makeJWT,
 	makeRefreshToken,
 } from "../auth.js";
@@ -13,7 +14,6 @@ import { config } from "../config.js";
 import {
 	revokeRefreshToken,
 	saveRefreshToken,
-	getUserFromRefreshToken,
 } from "../db/queries/refreshToken.js";
 
 type parameters = {
@@ -23,6 +23,12 @@ type parameters = {
 };
 
 type UserResponse = Omit<NewUser, "hashedPassword">;
+type TokenResponse = {
+	token: string;
+	refreshToken: string;
+};
+type PayloadResponse = UserResponse & TokenResponse;
+
 const oneHourInSeconds = 60 * 60;
 const sixtyDays = 60 * 60 * 24 * 60 * 1000;
 
@@ -51,7 +57,7 @@ export async function handlerLogin(req: Request, res: Response) {
 	const saveToken = await saveRefreshToken(refreshToken);
 	if (!saveToken) throw new Error(`Could not save token`);
 
-	const payload = {
+	const payload: PayloadResponse = {
 		id: user.id,
 		createdAt: user.createdAt,
 		updatedAt: user.updatedAt,
@@ -63,20 +69,8 @@ export async function handlerLogin(req: Request, res: Response) {
 }
 
 export async function handlerRefreshToken(req: Request, res: Response) {
-	const bearerToken = getBearerToken(req);
-	const refreshToken = await getUserFromRefreshToken(bearerToken);
-	if (
-		!refreshToken ||
-		refreshToken.revokedAt ||
-		refreshToken.expiresAt < new Date()
-	)
-		throw new UnauthorizedError("Invalid or Expired Refresh Token");
-
-	const accessToken = makeJWT(
-		refreshToken.userId,
-		oneHourInSeconds,
-		config.jwtSecret,
-	);
+	const userId = await getUserIdFromRefreshToken(req);
+	const accessToken = makeJWT(userId, oneHourInSeconds, config.jwtSecret);
 	respondWithJSON(res, 200, { token: accessToken });
 }
 

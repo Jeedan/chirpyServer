@@ -12,7 +12,7 @@ import {
 	handlerGetAllChirps,
 	handlerGetChirp,
 } from "./api/chirps.js";
-import { handlerCreateUser } from "./api/users.js";
+import { handlerCreateUser, handlerUpdateUser } from "./api/users.js";
 import {
 	handlerLogin,
 	handlerRefreshToken,
@@ -41,6 +41,7 @@ app.get("/api/chirps/:chirpId", asyncHandler(handlerGetChirp));
 
 // users
 app.post("/api/users", asyncHandler(handlerCreateUser));
+app.put("/api/users", asyncHandler(handlerUpdateUser));
 
 // login
 app.post("/api/login", asyncHandler(handlerLogin));

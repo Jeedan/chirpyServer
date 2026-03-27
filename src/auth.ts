@@ -2,8 +2,9 @@ import argon2 from "argon2";
 import { Request } from "express";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
-import { BadRequestError, UnauthorizedError } from "./api/errors.js";
+import { UnauthorizedError } from "./api/errors.js";
 import { randomBytes } from "node:crypto";
+import { getUserFromRefreshToken } from "./db/queries/refreshToken.js";
 
 export async function hashPassword(password: string): Promise<string> {
 	const hash = await argon2.hash(password);
@@ -45,8 +46,7 @@ export function validateJWT(tokenString: string, secret: string): string {
 	try {
 		const token = jwt.verify(tokenString, secret) as JwtPayload;
 		const userID = token.sub;
-		if (!userID) throw new Error("No userID in token");
-		console.log(userID);
+		if (!userID) throw new UnauthorizedError("No userID in token");
 		return userID;
 	} catch (err: unknown) {
 		if (err instanceof Error) {
@@ -66,15 +66,28 @@ export function getBearerToken(req: Request): string {
 
 export function extractBearerToken(header: string | undefined): string {
 	if (!header || !header.startsWith("Bearer "))
-		throw new BadRequestError("No Authorization token found");
+		throw new UnauthorizedError("No Authorization token found");
 	const splitHeader = header.split(" ");
 	if (splitHeader.length < 2)
-		throw new BadRequestError("Invalid Bearer Token");
+		throw new UnauthorizedError("Invalid or Malformed Bearer Token");
 	const token = splitHeader[1];
-	if (!token) throw new BadRequestError("Empty Token");
+	if (!token) throw new UnauthorizedError("No Token found");
 	return token;
 }
 
 export function makeRefreshToken(): string {
 	return randomBytes(32).toString("hex");
+}
+
+export async function getUserIdFromRefreshToken(req: Request) {
+	const bearerToken = getBearerToken(req);
+	const refreshToken = await getUserFromRefreshToken(bearerToken);
+	if (
+		!refreshToken ||
+		refreshToken.revokedAt ||
+		refreshToken.expiresAt < new Date()
+	)
+		throw new UnauthorizedError("Invalid or Expired Refresh Token");
+
+	return refreshToken.userId;
 }
