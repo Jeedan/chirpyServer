@@ -24,7 +24,7 @@ export async function checkPasswordHash(
 // sub is the subject of the token, which is the user's ID.
 // iat is the time the token was issued. Use Math.floor(Date.now() / 1000) to get the current time in seconds.
 // exp is the time the token expires. Use iat + expiresIn to set the expiration
-type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
+type Payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
 export function makeJWT(
 	userID: string,
@@ -32,7 +32,7 @@ export function makeJWT(
 	secret: string,
 ): string {
 	const issuedAt = Math.floor(Date.now() / 1000);
-	const payload: payload = {
+	const payload: Payload = {
 		iss: "chirpy",
 		sub: userID,
 		iat: issuedAt,

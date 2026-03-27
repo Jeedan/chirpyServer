@@ -6,7 +6,7 @@ import { NewUser } from "../db/schema.js";
 import { createUser, updateUserEmailAndPassword } from "../db/queries/users.js";
 import { config } from "../config.js";
 
-type parameters = {
+type BodyParams = {
 	email: string;
 	password: string;
 };
@@ -14,7 +14,7 @@ type parameters = {
 type UserResponse = Omit<NewUser, "hashedPassword">;
 
 export async function handlerCreateUser(req: Request, res: Response) {
-	const { email, password }: parameters = req.body;
+	const { email, password }: BodyParams = req.body;
 
 	if (!password || password.length === 0)
 		throw new BadRequestError("No password provided to update");
@@ -38,7 +38,7 @@ export async function handlerCreateUser(req: Request, res: Response) {
 }
 
 export async function handlerUpdateUser(req: Request, res: Response) {
-	const { email, password }: parameters = req.body;
+	const { email, password }: BodyParams = req.body;
 	const accessToken = getBearerToken(req);
 	const userId = validateJWT(accessToken, config.jwt.secret);
 

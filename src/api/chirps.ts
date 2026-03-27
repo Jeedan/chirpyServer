@@ -10,19 +10,18 @@ import {
 import { validateJWT, getBearerToken } from "../auth.js";
 import { config } from "../config.js";
 
-type parameters = {
+type BodyParams = {
 	body: string;
 };
 
 export async function handlerCreateChirp(req: Request, res: Response) {
-	const params: parameters = req.body;
-	const { body } = params;
+	const { body }: BodyParams = req.body;
 
 	const userId = getUserIdFromToken(req);
 
 	if (!body || body.length === 0) throw new BadRequestError("Empty Chirp");
 
-	const cleanedBody = validateChirp(params);
+	const cleanedBody = validateChirp(body);
 	const chirp = await createChirp({ body: cleanedBody, userId });
 
 	const payload = {
@@ -45,10 +44,8 @@ function getUserIdFromToken(req: Request): string {
 	return userId;
 }
 
-function validateChirp(params: parameters): string {
+function validateChirp(body: string): string {
 	const maxSize = 140;
-
-	const body = params.body;
 	if (body.length > maxSize)
 		throw new BadRequestError("Chirp is too long. Max length is 140");
 

@@ -16,7 +16,7 @@ import {
 	saveRefreshToken,
 } from "../db/queries/refreshToken.js";
 
-type parameters = {
+type BodyParams = {
 	email: string;
 	password: string;
 	//expiresInSeconds?: number;
@@ -33,7 +33,7 @@ const oneHourInSeconds = 60 * 60;
 const sixtyDays = 60 * 60 * 24 * 60 * 1000;
 
 export async function handlerLogin(req: Request, res: Response) {
-	const { email, password }: parameters = req.body;
+	const { email, password }: BodyParams = req.body;
 
 	const user = await getUserByEmail(email);
 	if (!user)
