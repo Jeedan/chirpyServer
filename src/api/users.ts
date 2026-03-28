@@ -27,12 +27,7 @@ export async function handlerCreateUser(req: Request, res: Response) {
 	const user = await createUser({ email, hashedPassword });
 	if (!user) throw new Error("Could not create user");
 
-	const payload: UserResponse = {
-		id: user.id,
-		email: user.email,
-		createdAt: user.createdAt,
-		updatedAt: user.updatedAt,
-	};
+	const payload: UserResponse = userPayload(user);
 
 	respondWithJSON(res, 201, payload);
 }
@@ -58,12 +53,17 @@ export async function handlerUpdateUser(req: Request, res: Response) {
 
 	if (!updatedUser) throw new Error("Could not update user");
 
-	const payload: UserResponse = {
-		id: updatedUser.id,
-		email: updatedUser.email,
-		createdAt: updatedUser.createdAt,
-		updatedAt: updatedUser.updatedAt,
-	};
+	const payload: UserResponse = userPayload(updatedUser);
 
 	respondWithJSON(res, 200, payload);
+}
+
+function userPayload(user: UserResponse) {
+	return {
+		id: user.id,
+		email: user.email,
+		createdAt: user.createdAt,
+		updatedAt: user.updatedAt,
+		isChirpyRed: user.isChirpyRed,
+	};
 }

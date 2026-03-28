@@ -19,6 +19,7 @@ import {
 	handlerRefreshToken,
 	handlerRevokeToken,
 } from "./api/auth.js";
+import { handlerUpgradeUser } from "./api/webhooks.js";
 
 const app = express();
 const PORT = 8080;
@@ -49,6 +50,9 @@ app.put("/api/users", asyncHandler(handlerUpdateUser));
 app.post("/api/login", asyncHandler(handlerLogin));
 app.post("/api/refresh", asyncHandler(handlerRefreshToken));
 app.post("/api/revoke", asyncHandler(handlerRevokeToken));
+
+// webhook
+app.post("/api/polka/webhooks", asyncHandler(handlerUpgradeUser));
 
 // health check
 app.get("/api/healthz", handlerReadiness);

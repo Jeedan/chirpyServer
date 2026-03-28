@@ -40,6 +40,15 @@ export async function updateUserEmailAndPassword(
 	return result;
 }
 
+export async function updateUserIsChirpyRed(id: string, isChirpyRed: boolean) {
+	const [result] = await db
+		.update(users)
+		.set({ isChirpyRed })
+		.where(eq(users.id, id))
+		.returning();
+	return result;
+}
+
 export async function deleteUsers() {
 	const result = await db.delete(users).returning();
 	return result;
