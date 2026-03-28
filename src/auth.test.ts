@@ -4,7 +4,7 @@ import {
 	hashPassword,
 	makeJWT,
 	validateJWT,
-	extractBearerToken,
+	extractToken,
 } from "./auth.js";
 
 describe("Password Hashing", () => {
@@ -47,26 +47,26 @@ describe("JWT", () => {
 });
 
 describe("Get Bearer Token", () => {
-	const token = extractBearerToken("Bearer token123");
+	const token = extractToken("Bearer token123", "Bearer");
 	it("should return true if the token matches the Authorization header", async () => {
 		expect(token).toBe("token123");
 	});
 
 	it("should throw when an empty string is passed as Header", async () => {
 		expect(() => {
-			const token = extractBearerToken("");
+			const token = extractToken("", "");
 		}).toThrow();
 	});
 
 	it("should throw when missing the token in the Authorization header", async () => {
 		expect(() => {
-			const token = extractBearerToken("Bearer ");
+			const token = extractToken("Bearer ", "Bearer");
 		}).toThrow();
 	});
 
 	it("should throw when missing the Bearer part of the Authorization header", async () => {
 		expect(() => {
-			const token = extractBearerToken(" 123Token");
+			const token = extractToken(" 123Token", "");
 		}).toThrow();
 	});
 });

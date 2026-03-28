@@ -2,7 +2,7 @@ import argon2 from "argon2";
 import { Request } from "express";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
-import { UnauthorizedError } from "./api/errors.js";
+import { BadRequestError, UnauthorizedError } from "./api/errors.js";
 import { randomBytes } from "node:crypto";
 import { getUserFromRefreshToken } from "./db/queries/refreshToken.js";
 
@@ -61,17 +61,22 @@ export function validateJWT(tokenString: string, secret: string): string {
 
 export function getBearerToken(req: Request): string {
 	const bearerHeader = req.get("Authorization");
-	return extractBearerToken(bearerHeader);
+	return extractToken(bearerHeader, "Bearer");
 }
 
-export function extractBearerToken(header: string | undefined): string {
-	if (!header || !header.startsWith("Bearer "))
-		throw new UnauthorizedError("No Authorization token found");
-	const splitHeader = header.split(" ");
-	if (splitHeader.length < 2)
-		throw new UnauthorizedError("Invalid or Malformed Bearer Token");
-	const token = splitHeader[1];
-	if (!token) throw new UnauthorizedError("No Token found");
+export function getApiKey(req: Request): string {
+	const apiKeyHeader = req.get("Authorization");
+	return extractToken(apiKeyHeader, "ApiKey");
+}
+
+export function extractToken(
+	header: string | undefined,
+	scheme: string,
+): string {
+	if (!header || !scheme || !header.startsWith(`${scheme} `))
+		throw new UnauthorizedError(`Missing or malformed ${scheme} header`);
+	const token = header.split(" ")[1];
+	if (!token) throw new UnauthorizedError(`Missing ${scheme} value`);
 	return token;
 }
 
