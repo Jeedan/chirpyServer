@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { respondWithError, respondWithJSON } from "./json.js";
+import { respondWithJSON } from "./json.js";
 import { BadRequestError, ForbiddenError, NotFoundError } from "./errors.js";
 import {
 	createChirp,
 	deleteChirpById,
-	getAllChirps,
+	getChirps,
 	getChirpById,
 } from "../db/queries/chirps.js";
 import { validateJWT, getBearerToken } from "../auth.js";
@@ -62,10 +62,18 @@ function validateChirp(body: string): string {
 }
 
 export async function handlerGetAllChirps(req: Request, res: Response) {
-	const chirps = await getAllChirps();
-	if (chirps.length === 0)
-		throw new NotFoundError("No Chirps found in Database");
+	const sortBy = getQueryParams(req, "sort");
+	const authorId = getQueryParams(req, "authorId");
+	const chirps = await getChirps(authorId, sortBy);
 	respondWithJSON(res, 200, chirps);
+}
+
+function getQueryParams(req: Request, key: string) {
+	const param = req.query[key];
+	if (typeof param === "string") {
+		return param;
+	}
+	return undefined;
 }
 
 export async function handlerGetChirp(req: Request, res: Response) {

@@ -39,6 +39,7 @@ export const chirps = pgTable("chirps", {
 });
 
 export type NewChirp = typeof chirps.$inferInsert;
+export type Chirp = typeof chirps.$inferSelect;
 
 // refresh_tokens
 export const refreshTokens = pgTable("refresh_tokens", {
